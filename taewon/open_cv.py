@@ -4,10 +4,8 @@ import matplotlib.pylab as plt
 
 # 이미지 읽어오기
 imgs = []
-#imgs.append(cv2.imread('taewon\png\white_noise.png'))
-#imgs.append(cv2.imread('taewon\png\partial_white_noise.jpg'))
-imgs.append(cv2.imread('taewon\png\yujin_noise.png'))
-imgs.append(cv2.imread('taewon\png\yujin_original.png'))
+imgs.append(cv2.imread('taewon\png\input.jpg'))
+imgs.append(cv2.imread('taewon\png\partial_white_noise.jpg'))
 
 hists = []
 for img in imgs:
@@ -19,6 +17,16 @@ for img in imgs:
     cv2.normalize(hist, hist, 0, 1, cv2.NORM_MINMAX)
     # hists 리스트에 저장
     hists.append(hist)
+
+# 시각화
+for i, hist in enumerate(hists):
+    plt.figure()
+    plt.title(f"Histogram of Image {i+1}")
+    plt.xlabel('Hue')
+    plt.ylabel('Saturation')
+    plt.imshow(hist, interpolation='nearest')
+    plt.colorbar()
+    plt.show()
 
 # 1번째 이미지를 원본으로 지정
 query = hists[0]
