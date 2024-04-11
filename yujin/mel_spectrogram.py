@@ -2,34 +2,16 @@ import numpy as np
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
-import soundfile as sf
 from scipy.spatial.distance import euclidean
 from scipy.stats import pearsonr
 from skimage.metrics import structural_similarity as ssim
 
-# # 원본 WAV 파일 로드
-# original_wav, sr = librosa.load('yujin/wav/original.wav')
-
-# # 원본 WAV 파일의 길이 확인
-# original_length = len(original_wav)
-
-# # 노이즈 생성 (두 번째 인자가 곧 표준편차인데, 이걸 더 크게 조정하여 더 강한 노이즈를 생성할 수 있음)
-# strong_noise = np.random.normal(0, 0.1, original_length)
-
-# # 원본 WAV 파일에 노이즈 추가
-# noise_wav = original_wav + strong_noise
-
-# # 노이즈가 추가된 WAV 파일 저장
-# sf.write('yujin/wav/noise.wav', noise_wav, sr)
-
-
-
 # 첫 번째 음성 오디오 파일 로드
-audio_file1 = 'yujin/wav/input.wav'
+audio_file1 = 'yujin/wav/sy_original.wav'
 y1, sr1 = librosa.load(audio_file1)
 
 # 두 번째 음성 오디오 파일 로드
-audio_file2 = 'yujin/wav/input_noise.wav'
+audio_file2 = 'yujin/wav/sy_noise.wav'
 y2, sr2 = librosa.load(audio_file2)
 
 # 첫 번째 음성의 멜 스펙트로그램 생성
@@ -76,7 +58,6 @@ euclidean_dist, pearson_corr, ssim_index = compare_mel_spectrograms(S1_db, S2_db
 
 # 유사도 측정 함수
 def calculate_similarity(euclidean_dist, pearson_corr, ssim_index):
-    # 각 지표의 범위를 정의합니다.
     euclidean_min = 0  # 유클리드 거리 최소값
     euclidean_max = 20000  # 유클리드 거리 최대값
     pearson_min = -1  # 피어슨 상관 계수 최소값
