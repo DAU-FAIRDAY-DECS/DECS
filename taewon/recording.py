@@ -48,5 +48,5 @@ plt.ylabel('Amplitude')
 plt.show()
 
 # WAV 파일로 저장
-sf.write(WAVE_OUTPUT_FILENAME, RATE, frames)
+sf.write(WAVE_OUTPUT_FILENAME, audio_data, RATE)
 print(f"* '{WAVE_OUTPUT_FILENAME}' 파일로 저장되었습니다.")
