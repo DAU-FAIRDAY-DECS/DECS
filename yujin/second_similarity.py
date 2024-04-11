@@ -7,11 +7,11 @@ from scipy.stats import pearsonr
 from skimage.metrics import structural_similarity as ssim
 
 # 첫 번째 음성 오디오 파일 로드
-audio_file1 = 'yujin/wav/yujin_voice_original.wav'
+audio_file1 = 'yujin/wav/sy_original.wav'
 y1, sr1 = librosa.load(audio_file1)
 
 # 두 번째 음성 오디오 파일 로드
-audio_file2 = 'yujin/wav/yujin_voice_noise.wav'
+audio_file2 = 'yujin/wav/sy_noise.wav'
 y2, sr2 = librosa.load(audio_file2)
 
 # 첫 번째 음성의 멜 스펙트로그램 생성
@@ -71,7 +71,7 @@ def calculate_similarity(euclidean_dist, pearson_corr, ssim_index):
     normalized_ssim = (ssim_index - ssim_min) / (ssim_max - ssim_min)
 
     # 임의의 가중치를 적용하여 유사도를 계산
-    similarity = (normalized_euclidean * 0.4 + normalized_pearson * 0.3 + normalized_ssim * 0.3)
+    similarity = (normalized_euclidean * 0.25 + normalized_pearson * 0.25 + normalized_ssim * 0.5)
 
     # 유사도를 백분율로 변환
     similarity_percentage = similarity * 100
@@ -85,9 +85,9 @@ def calculate_similarity_per_second(audio_file1, audio_file2, frame_length=1):
     # 두 번째 음성 오디오 파일 로드
     y2, sr2 = librosa.load(audio_file2)
     
-    # 샘플링 레이트가 다른 경우, 동일하게 만듭니다.
+    # 샘플링 레이트가 다른 경우, 동일하게 만듦
     if sr1 != sr2:
-        raise ValueError("샘플링 레이트가 다릅니다.")
+        raise ValueError("샘플링 레이트가 다릅니다 ..")
     
     # 샘플당 프레임 수 계산
     frame_length_samples = int(sr1 * frame_length)
@@ -113,6 +113,11 @@ def calculate_similarity_per_second(audio_file1, audio_file2, frame_length=1):
         # 유사도 백분율로 변환
         similarity_percentage = calculate_similarity(euclidean_dist, pearson_corr, ssim_index)
         
+        # 유사도에 따라 가중치 설정
+        weight = 0.5  # 초기 가중치 설정
+        if similarity_percentage < 100:
+            weight += (100 - similarity_percentage) * 0.01  # 가중치 증가
+        
         # 결과 저장
         similarity_per_second.append(similarity_percentage)
     
@@ -123,3 +128,7 @@ similarity_per_second = calculate_similarity_per_second(audio_file1, audio_file2
 # 결과 출력
 for i, similarity in enumerate(similarity_per_second):
     print("{}초부터 {}초까지의 유사도: {:.2f}%".format(i, i+1, similarity))
+
+# 결과 출력
+total_similarity = sum(similarity_per_second) / len(similarity_per_second)
+print("전체 유사도: {:.2f}%".format(total_similarity))
