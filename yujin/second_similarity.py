@@ -7,11 +7,11 @@ from scipy.stats import pearsonr
 from skimage.metrics import structural_similarity as ssim
 
 # 첫 번째 음성 오디오 파일 로드
-audio_file1 = 'yujin/wav/sy_original.wav'
+audio_file1 = 'yujin/wav/yujin_voice_original.wav'
 y1, sr1 = librosa.load(audio_file1)
 
 # 두 번째 음성 오디오 파일 로드
-audio_file2 = 'yujin/wav/sy_noise.wav'
+audio_file2 = 'yujin/wav/yujin_voice_noise.wav'
 y2, sr2 = librosa.load(audio_file2)
 
 # 첫 번째 음성의 멜 스펙트로그램 생성
@@ -78,13 +78,48 @@ def calculate_similarity(euclidean_dist, pearson_corr, ssim_index):
 
     return similarity_percentage
 
-# 결과 출력
-print("유클리드 거리:", euclidean_dist)
-print("피어슨 상관 계수:", pearson_corr)
-print("구조적 유사성 지수:", ssim_index)
+def calculate_similarity_per_second(audio_file1, audio_file2, frame_length=1):
+    # 첫 번째 음성 오디오 파일 로드
+    y1, sr1 = librosa.load(audio_file1)
+    
+    # 두 번째 음성 오디오 파일 로드
+    y2, sr2 = librosa.load(audio_file2)
+    
+    # 샘플링 레이트가 다른 경우, 동일하게 만듭니다.
+    if sr1 != sr2:
+        raise ValueError("샘플링 레이트가 다릅니다.")
+    
+    # 샘플당 프레임 수 계산
+    frame_length_samples = int(sr1 * frame_length)
+    
+    # 각 오디오 파일을 1초씩 분할하여 각 초마다의 유사성 측정
+    similarity_per_second = []
+    for i in range(0, min(len(y1), len(y2)), frame_length_samples):
+        # 각 초마다의 오디오 데이터 추출
+        y1_sec = y1[i:i+frame_length_samples]
+        y2_sec = y2[i:i+frame_length_samples]
+        
+        # 멜 스펙트로그램 계산
+        S1 = librosa.feature.melspectrogram(y=y1_sec, sr=sr1)
+        S2 = librosa.feature.melspectrogram(y=y2_sec, sr=sr2)
+        
+        # 스펙트로그램을 dB로 변환
+        S1_db = librosa.power_to_db(S1, ref=np.max)
+        S2_db = librosa.power_to_db(S2, ref=np.max)
+        
+        # 유사도 계산
+        euclidean_dist, pearson_corr, ssim_index = compare_mel_spectrograms(S1_db, S2_db)
+        
+        # 유사도 백분율로 변환
+        similarity_percentage = calculate_similarity(euclidean_dist, pearson_corr, ssim_index)
+        
+        # 결과 저장
+        similarity_per_second.append(similarity_percentage)
+    
+    return similarity_per_second
 
-# 유사도 측정
-similarity_percentage = calculate_similarity(euclidean_dist, pearson_corr, ssim_index)
+similarity_per_second = calculate_similarity_per_second(audio_file1, audio_file2)
 
 # 결과 출력
-print("유사도: {:.2f}%".format(similarity_percentage))
+for i, similarity in enumerate(similarity_per_second):
+    print("{}초부터 {}초까지의 유사도: {:.2f}%".format(i, i+1, similarity))
