@@ -71,7 +71,7 @@ def calculate_similarity(euclidean_dist, pearson_corr, ssim_index):
     normalized_ssim = (ssim_index - ssim_min) / (ssim_max - ssim_min)
 
     # 임의의 가중치를 적용하여 유사도를 계산
-    similarity = (normalized_euclidean * 0.4 + normalized_pearson * 0.3 + normalized_ssim * 0.3)
+    similarity = (normalized_euclidean * 0.25 + normalized_pearson * 0.25 + normalized_ssim * 0.5)
 
     # 유사도를 백분율로 변환
     similarity_percentage = similarity * 100
