@@ -26,7 +26,7 @@ def add_variable_white_noise(data, intervals, sr=22050):
     return data_with_noise
 
 # 노이즈를 추가할 구간 설정: [(시작 시간, 끝 시간, 노이즈 레벨), ...]
-intervals = [(5, 7, 0.05), (10, 11, 0.2), (15, 16, 0.1), (25, 27, 0.15)]
+intervals = [(5, 7, 0.05), (10, 11, 0.2), (15, 16, 0.1), (25, 27, 0.15), (31, 32, 0.3), (36, 38, 0.04)]
 
 # 지정된 구간에 노이즈 추가
 noisy_data = add_variable_white_noise(data, intervals)
