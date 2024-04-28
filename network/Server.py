@@ -1,13 +1,13 @@
-import socket              
- 
-s = socket.socket()        
-host = socket.gethostname() 
-port = 12345               
-s.bind((host, port))       
-f = open('2.png','wb')
-s.listen(5)                
+import socket       
+
+s = socket.socket()
+host = socket.gethostname()
+port = 12345
+s.bind((host, port))
+f = open('2.wav','wb')
+s.listen(5)
 while True:
-    c, addr = s.accept()    
+    c, addr = s.accept()
     print ('Got connection from', addr)
     print ('Receiving...')
     l = c.recv(8096)
@@ -18,4 +18,4 @@ while True:
     f.close()
     print ('Done Receiving')
     c.send('Thank you for connecting')
-    c.close()               
+    c.close()
