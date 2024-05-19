@@ -1,45 +1,41 @@
 import socket
 import pyaudio
-import sys
 
-# 오디오 스트림 설정
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 44100
-CHUNK = 1024
+FORMAT = pyaudio.paInt16 # 16비트 정수 형식
+CHANNELS = 1 # 단일 채널
+RATE = 8000 # 전화 품질
+CHUNK = 160 # 청크 크기
+IP = "192.168.25.3" # 수신자 IP
+PORT = 5005 # 포트 번호
 
-audio = pyaudio.PyAudio()
+def setup_audio_stream():
+    audio = pyaudio.PyAudio()
+    return audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True, frames_per_buffer=CHUNK)
 
-# 오디오 스트림 열기 (스피커 출력)
-stream = audio.open(format=FORMAT, channels=CHANNELS,
-                    rate=RATE, output=True,
-                    frames_per_buffer=CHUNK)
+def create_udp_socket():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind((IP, PORT))
+    return sock
 
-# 네트워크 설정
-ip = "0.0.0.0"
-port = 5005
-
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind((ip, port))
-
-# 초기 'SYN' 메시지 대기
-print("연결 대기 중...")
-data, addr = sock.recvfrom(1024)
-if data.decode() == 'SYN':
-    sock.sendto(b'ACK', addr)
-    print("연결 확립")
-
-# 이후 데이터 수신 및 재생
-while True:
+def main():
+    stream = setup_audio_stream()
+    sock = create_udp_socket()
+    print("연결 대기 중...")
+    data, addr = sock.recvfrom(CHUNK)
+    if data.decode() == 'SYN':
+        sock.sendto(b'ACK', addr)
+        print("연결 확립")
+    
     try:
-        data, _ = sock.recvfrom(CHUNK)
-        stream.write(data)
+        while True:
+            data, _ = sock.recvfrom(320)
+            stream.write(data)
     except KeyboardInterrupt:
         print("수신 종료")
-        break
+    finally:
+        stream.stop_stream()
+        stream.close()
+        sock.close()
 
-# 자원 해제
-stream.stop_stream()
-stream.close()
-audio.terminate()
-sock.close()
+if __name__ == '__main__':
+    main()

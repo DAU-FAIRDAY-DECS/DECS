@@ -1,52 +1,42 @@
 import socket
 import pyaudio
-import sys
 
-# 오디오 스트림 설정
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 44100
-CHUNK = 256
+FORMAT = pyaudio.paInt16 # 16비트 정수 형식
+CHANNELS = 1 # 단일 채널
+RATE = 8000 # 전화 품질
+CHUNK = 160 # 청크 크기
+IP = "192.168.25.3" # 송신자 IP
+PORT = 5005 # 포트 번호
 
-audio = pyaudio.PyAudio()
+def setup_audio_stream():
+    audio = pyaudio.PyAudio()
+    return audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
 
-# 오디오 스트림 열기 (마이크 입력)
-stream = audio.open(format=FORMAT, channels=CHANNELS,
-                    rate=RATE, input=True,
-                    frames_per_buffer=CHUNK)
+def create_udp_socket():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return sock
 
-# 네트워크 설정
-ip = "192.168.1.101"  # 수신자의 IP 주소로 변경
-port = 5005
-
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-# 연결 확인을 위해 'SYN' 메시지 전송
-sock.sendto(b'SYN', (ip, port))
-try:
-    # 응답 대기
-    sock.settimeout(5)  # 5초 대기
-    data, addr = sock.recvfrom(CHUNK)
-    if data.decode() == 'ACK':
-        print("연결 확인 완료")
-    else:
-        print("유효하지 않은 응답")
-        sys.exit()
-except socket.timeout:
-    print("응답 시간 초과")
-    sys.exit()
-
-# 연결이 성공적으로 확인된 후 오디오 데이터 전송 시작
-while True:
+def main():
+    stream = setup_audio_stream()
+    sock = create_udp_socket()
+    sock.sendto(b'SYN', (IP, PORT))
     try:
-        data = stream.read(CHUNK)
-        sock.sendto(data, (ip, port))
+        data, addr = sock.recvfrom(CHUNK)
+        if data.decode() == 'ACK':
+            print("연결 확인 완료")
+            while True:
+                data = stream.read(CHUNK)
+                sock.sendto(data, (IP, PORT))
+        else:
+            print("유효하지 않은 응답")
+    except socket.timeout:
+        print("응답 시간 초과")
     except KeyboardInterrupt:
         print("송신 종료")
-        break
+    finally:
+        stream.stop_stream()
+        stream.close()
+        sock.close()
 
-# 자원 해제
-stream.stop_stream()
-stream.close()
-audio.terminate()
-sock.close()
+if __name__ == '__main__':
+    main()
