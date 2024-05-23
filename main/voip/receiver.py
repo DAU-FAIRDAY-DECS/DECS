@@ -1,12 +1,17 @@
+# zlib 모듈 활용
+# LZ77 알고리즘
+# 허프만 코딩
+
 import socket
 import pyaudio
+import zlib
 
-FORMAT = pyaudio.paInt16 # 16비트 정수 형식
-CHANNELS = 1 # 단일 채널
-RATE = 8000 # 전화 품질
-CHUNK = 160 # 청크 크기
-IP = "192.168.25.3" # 수신자 IP
-PORT = 5005 # 포트 번호
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 8000
+CHUNK = 160
+IP = "0.0.0.0"
+PORT = 5005
 
 def setup_audio_stream():
     audio = pyaudio.PyAudio()
@@ -28,8 +33,13 @@ def main():
     
     try:
         while True:
-            data, _ = sock.recvfrom(320)
-            stream.write(data)
+            data, _ = sock.recvfrom(1024)
+            if len(data) < 4:
+                continue
+            seq_num = int.from_bytes(data[:4], 'big')
+            compressed_data = data[4:]
+            decompressed_data = zlib.decompress(compressed_data)
+            stream.write(decompressed_data)
     except KeyboardInterrupt:
         print("수신 종료")
     finally:

@@ -1,12 +1,17 @@
+# zlib 모듈 활용
+# LZ77 알고리즘
+# 허프만 코딩
+
 import socket
 import pyaudio
+import zlib
 
-FORMAT = pyaudio.paInt16 # 16비트 정수 형식
-CHANNELS = 1 # 단일 채널
-RATE = 8000 # 전화 품질
-CHUNK = 160 # 청크 크기
-IP = "192.168.25.3" # 송신자 IP
-PORT = 5005 # 포트 번호
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 8000
+CHUNK = 160
+IP = "192.168.0.13"
+PORT = 5005
 
 def setup_audio_stream():
     audio = pyaudio.PyAudio()
@@ -20,13 +25,19 @@ def main():
     stream = setup_audio_stream()
     sock = create_udp_socket()
     sock.sendto(b'SYN', (IP, PORT))
+    seq_num = 0
     try:
         data, addr = sock.recvfrom(CHUNK)
         if data.decode() == 'ACK':
             print("연결 확인 완료")
             while True:
                 data = stream.read(CHUNK)
-                sock.sendto(data, (IP, PORT))
+                compressed_data = zlib.compress(data, level=9)
+                packet = seq_num.to_bytes(4, 'big') + compressed_data
+                sock.sendto(packet, (IP, PORT))
+                seq_num += 1
+                if seq_num > 2**32 - 1:
+                    seq_num = 0
         else:
             print("유효하지 않은 응답")
     except socket.timeout:
