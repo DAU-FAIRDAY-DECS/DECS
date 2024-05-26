@@ -14,7 +14,7 @@ CHUNK = 1024 # 처리할 프레임 수
 PORT = 9001 # 포트 번호
 SENDER_CONTROL_PORT = 9002 # 송신자 제어 메시지 포트 번호
 RECEIVER_CONTROL_PORT = 9003 # 수신자 제어 메시지 포트 번호
-RECEIVER_IP = '10.10.1.90' # 수신자 IP 주소
+RECEIVER_IP = '10.10.1.152' # 수신자 IP 주소
 
 def send_audio():
     # PyAudio 객체 생성 및 스트림 초기화
@@ -30,7 +30,7 @@ def send_audio():
     print("송신 시작")
     
     # 입력 오디오 파일을 작성하기 위한 wave 객체 생성
-    wf = wave.open("input.wav", 'wb')
+    wf = wave.open("main/voip/wav/input.wav", 'wb')
     wf.setnchannels(CHANNELS)
     wf.setsampwidth(p.get_sample_size(FORMAT))
     wf.setframerate(RATE)
