@@ -16,7 +16,7 @@ CHUNK = 1024 # 버퍼당 프레임 수
 PORT = 9001 # 통신 포트 번호
 SENDER_CONTROL_PORT = 9002 # 송신자 제어 메시지 포트 번호
 RECEIVER_CONTROL_PORT = 9003 # 수신자 제어 메시지 포트 번호
-SENDER_IP = '192.168.25.3' # 송신자 IP 주소
+SENDER_IP = '192.168.0.13' # 송신자 IP 주소
 
 def receive_audio():
     # PyAudio 초기화 및 출력 스트림 열기
