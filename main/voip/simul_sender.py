@@ -8,19 +8,19 @@ import time
 import logging
 
 # 로깅 설정
-logging.basicConfig(filename='sender.log', level=logging.DEBUG, filemode='w')
+logging.basicConfig(filename='main/voip/log/sender.log', level=logging.DEBUG, filemode='w')
 
 # 오디오 설정
-FORMAT = pyaudio.paInt16  # 16비트 오디오 포맷
-CHANNELS = 1  # 모노 채널
-RATE = 8000  # 샘플링 레이트
-CHUNK = 1024  # 버퍼당 프레임 수
+FORMAT = pyaudio.paInt16 # 16비트 오디오 포맷
+CHANNELS = 1 # 모노 채널
+RATE = 8000 # 샘플링 레이트
+CHUNK = 1024 # 버퍼당 프레임 수
 
 # 포트 번호 및 수신자 IP 주소
-PORT = 9001  # 통신 포트 번호
-SENDER_CONTROL_PORT = 9002  # 송신자 제어 메시지 포트 번호
-RECEIVER_CONTROL_PORT = 9003  # 수신자 제어 메시지 포트 번호
-RECEIVER_IP = '192.168.85.47'  # 수신자 IP 주소
+PORT = 9001 # 통신 포트 번호
+SENDER_CONTROL_PORT = 9002 # 송신자 제어 메시지 포트 번호
+RECEIVER_CONTROL_PORT = 9003 # 수신자 제어 메시지 포트 번호
+RECEIVER_IP = '192.168.25.3' # 수신자 IP 주소
 
 def send_audio():
     # PyAudio 초기화 및 입력 스트림 열기
@@ -41,7 +41,7 @@ def send_audio():
     wf.setsampwidth(p.get_sample_size(FORMAT))
     wf.setframerate(RATE)
 
-    state = None  # ADPCM 상태 변수
+    state = None # ADPCM 상태 변수
 
     def check_for_control_messages():
         while True:
@@ -66,7 +66,7 @@ def send_audio():
         packet_id = 0
         while True:
             data = stream.read(CHUNK)
-            wf.writeframes(data)  # 입력 오디오 데이터를 파일에 저장
+            wf.writeframes(data) # 입력 오디오 데이터를 파일에 저장
 
             # PCM 데이터를 ADPCM 데이터로 압축 (압축화)
             compressed_data, state = audioop.lin2adpcm(data, 2, state)

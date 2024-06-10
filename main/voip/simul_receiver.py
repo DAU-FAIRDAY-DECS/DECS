@@ -8,19 +8,19 @@ import time
 import logging
 
 # 로깅 설정
-logging.basicConfig(filename='receiver.log', level=logging.DEBUG, filemode='w')
+logging.basicConfig(filename='main/voip/log/receiver.log', level=logging.DEBUG, filemode='w')
 
 # 오디오 설정
-FORMAT = pyaudio.paInt16  # 16비트 오디오 포맷
-CHANNELS = 1  # 모노 채널
-RATE = 8000  # 샘플링 레이트
-CHUNK = 1024  # 버퍼당 프레임 수
+FORMAT = pyaudio.paInt16 # 16비트 오디오 포맷
+CHANNELS = 1 # 모노 채널
+RATE = 8000 # 샘플링 레이트
+CHUNK = 1024 # 버퍼당 프레임 수
 
 # 포트 번호 및 송신자 IP 주소
-PORT = 9001  # 통신 포트 번호
-SENDER_CONTROL_PORT = 9002  # 송신자 제어 메시지 포트 번호
-RECEIVER_CONTROL_PORT = 9003  # 수신자 제어 메시지 포트 번호
-SENDER_IP = '192.168.85.47'  # 송신자 IP 주소
+PORT = 9001 # 통신 포트 번호
+SENDER_CONTROL_PORT = 9002 # 송신자 제어 메시지 포트 번호
+RECEIVER_CONTROL_PORT = 9003 # 수신자 제어 메시지 포트 번호
+SENDER_IP = '192.168.25.3' # 송신자 IP 주소
 
 def receive_audio():
     # PyAudio 초기화 및 출력 스트림 열기
@@ -41,7 +41,7 @@ def receive_audio():
     wf.setsampwidth(p.get_sample_size(FORMAT))
     wf.setframerate(RATE)
 
-    state = None  # ADPCM 상태 변수
+    state = None # ADPCM 상태 변수
 
     def check_for_control_messages():
         while True:
@@ -64,7 +64,7 @@ def receive_audio():
         packet_id = 0
         # UDP 소켓을 통해 수신된 데이터를 ADPCM 데이터로 재조립 (패킷 재조립)
         compressed_data, addr = sock.recvfrom(2048)
-        control_sock.sendto(b"START", (SENDER_IP, SENDER_CONTROL_PORT))  # 연결 시작 메시지 전송
+        control_sock.sendto(b"START", (SENDER_IP, SENDER_CONTROL_PORT)) # 연결 시작 메시지 전송
         print("오디오 수신 중")
         while True:
             # 패킷 지연 시뮬레이션 (0-100ms 랜덤 지연)
@@ -72,8 +72,8 @@ def receive_audio():
             
             # ADPCM 데이터를 PCM 데이터로 압축 해제 (압축 해제)
             data, state = audioop.adpcm2lin(compressed_data, 2, state)
-            wf.writeframes(data)  # 출력 오디오 데이터를 파일에 저장
-            stream.write(data)  # 오디오 데이터를 스피커로 출력
+            wf.writeframes(data) # 출력 오디오 데이터를 파일에 저장
+            stream.write(data) # 오디오 데이터를 스피커로 출력
             
             # WAV 파일의 현재 시간 계산
             current_time = packet_id * (CHUNK / RATE)
