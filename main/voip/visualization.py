@@ -25,9 +25,11 @@ def plot_waveforms(input_file, output_file, frame_size=1024):
     # input.wav 파형
     plt.subplot(2, 1, 1)
     plt.plot(input_time, input_data, label='Input Waveform', color='blue')
-    # 프레임 단위 세로선 추가
+    # 프레임 단위 세로선 및 번호 추가
     for n in range(0, len(input_data), frame_size):
+        frame_number = n // frame_size
         plt.axvline(x=n/input_rate, color='red', linestyle='--', linewidth=0.5)
+        plt.text(n/input_rate, max(input_data), f'{frame_number}', color='green', fontsize=8)
     plt.xlabel('Time [s]')
     plt.ylabel('Amplitude')
     plt.title('Input Waveform')
@@ -36,9 +38,11 @@ def plot_waveforms(input_file, output_file, frame_size=1024):
     # output.wav 파형
     plt.subplot(2, 1, 2)
     plt.plot(output_time, output_data, label='Output Waveform', color='orange')
-    # 프레임 단위 세로선 추가
+    # 프레임 단위 세로선 및 번호 추가
     for n in range(0, len(output_data), frame_size):
+        frame_number = n // frame_size
         plt.axvline(x=n/output_rate, color='red', linestyle='--', linewidth=0.5)
+        plt.text(n/output_rate, max(output_data), f'{frame_number}', color='green', fontsize=8)
     plt.xlabel('Time [s]')
     plt.ylabel('Amplitude')
     plt.title('Output Waveform')
