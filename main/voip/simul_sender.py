@@ -5,18 +5,22 @@ import wave
 import audioop
 import random
 import time
+import logging
+
+# 로깅 설정
+logging.basicConfig(filename='sender.log', level=logging.DEBUG, filemode='w')
 
 # 오디오 설정
-FORMAT = pyaudio.paInt16 # 16비트 오디오 포맷
-CHANNELS = 1 # 모노 채널
-RATE = 8000 # 샘플링 레이트
-CHUNK = 1024 # 버퍼당 프레임 수
+FORMAT = pyaudio.paInt16  # 16비트 오디오 포맷
+CHANNELS = 1  # 모노 채널
+RATE = 8000  # 샘플링 레이트
+CHUNK = 1024  # 버퍼당 프레임 수
 
 # 포트 번호 및 수신자 IP 주소
-PORT = 9001 # 통신 포트 번호
-SENDER_CONTROL_PORT = 9002 # 송신자 제어 메시지 포트 번호
-RECEIVER_CONTROL_PORT = 9003 # 수신자 제어 메시지 포트 번호
-RECEIVER_IP = '192.168.0.13' # 수신자 IP 주소
+PORT = 9001  # 통신 포트 번호
+SENDER_CONTROL_PORT = 9002  # 송신자 제어 메시지 포트 번호
+RECEIVER_CONTROL_PORT = 9003  # 수신자 제어 메시지 포트 번호
+RECEIVER_IP = '192.168.85.47'  # 수신자 IP 주소
 
 def send_audio():
     # PyAudio 초기화 및 입력 스트림 열기
@@ -37,7 +41,7 @@ def send_audio():
     wf.setsampwidth(p.get_sample_size(FORMAT))
     wf.setframerate(RATE)
 
-    state = None # ADPCM 상태 변수
+    state = None  # ADPCM 상태 변수
 
     def check_for_control_messages():
         while True:
@@ -59,12 +63,16 @@ def send_audio():
     first_packet = True
 
     try:
+        packet_id = 0
         while True:
             data = stream.read(CHUNK)
-            wf.writeframes(data) # 입력 오디오 데이터를 파일에 저장
+            wf.writeframes(data)  # 입력 오디오 데이터를 파일에 저장
 
             # PCM 데이터를 ADPCM 데이터로 압축 (압축화)
             compressed_data, state = audioop.lin2adpcm(data, 2, state)
+            
+            # WAV 파일의 현재 시간 계산
+            current_time = packet_id * (CHUNK / RATE)
             
             # 패킷 손실 시뮬레이션 (10% 확률로 패킷 손실)
             if random.random() > 0.1:
@@ -72,16 +80,20 @@ def send_audio():
                 time.sleep(random.uniform(0, 0.1))
                 # UDP 소켓을 통해 패킷 단위로 전송 (패킷화)
                 sock.sendto(compressed_data, server_address)
+                logging.debug(f'Sent packet {packet_id} at WAV time {current_time:.3f} seconds')
             else:
                 # 패킷 손실 시 빈 데이터 전송
                 empty_data, _ = audioop.lin2adpcm(bytes([0] * CHUNK), 2, state)
                 # UDP 소켓을 통해 패킷 단위로 전송 (패킷화)
                 sock.sendto(empty_data, server_address)
+                logging.debug(f'Sent empty packet (loss simulation) {packet_id} at WAV time {current_time:.3f} seconds')
                 
             # 첫 번째 패킷 전송 시 연결 시작 메시지 전송
             if first_packet:
                 control_sock.sendto(b"START", (RECEIVER_IP, RECEIVER_CONTROL_PORT))
                 first_packet = False
+            
+            packet_id += 1
     except KeyboardInterrupt:
         control_sock.sendto(b"END", (RECEIVER_IP, RECEIVER_CONTROL_PORT))
         print("오디오 송신 중지")
