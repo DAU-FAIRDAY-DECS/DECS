@@ -117,4 +117,16 @@ ADPCM 코덱을 사용하여 오디오 데이터를 압축합니다. 이는 원�
 - **혼동 행렬**: 정상 데이터를 거의 완벽하게 재구성하지만 비정상 데이터를 구분하는 데 어려움을 겪음
 
 ## References
-- ㅁㄴㅇㄹ
+
+1. [음성 오디오를 멜 스펙트로그램으로 매핑하여 생성된 이미지의 유사성을 분석](https://www.mdpi.com/2227-7390/11/3/498)
+
+2. [오디오 신호 처리](https://velog.io/@p2yeong/%EC%98%A4%EB%94%94%EC%98%A4-%EC%B2%98%EB%A6%ACAudio-Processing)
+
+3. [IP 인터컴 시스템](https://www.toa-products.com/international/download/spec/n-8000ex_kr_cb1k.pdf)
+
+4. [딥러닝 음성 처리 파이썬 실습](https://mz-moonzoo.tistory.com/68)
+
+5. [다중 오토인코더를 통한 치매 음성 데이터 이상 신호 감지](https://repository.hanyang.ac.kr/handle/20.500.11754/186520)
+
+6. [오토인코더 이상 탐지 알고리즘의 성능 비교](https://dcoll.ajou.ac.kr/dcollection/srch/srchDetail/000000032583?localeParam=ko)
+
