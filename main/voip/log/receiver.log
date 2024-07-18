@@ -55,11 +55,3 @@ DEBUG:root:Received packet 53 at WAV time 6.784 seconds
 DEBUG:root:Received packet 54 at WAV time 6.912 seconds
 DEBUG:root:Received packet 55 at WAV time 7.040 seconds
 DEBUG:root:Received packet 56 at WAV time 7.168 seconds
-DEBUG:root:Received packet 57 at WAV time 7.296 seconds
-DEBUG:root:Received packet 58 at WAV time 7.424 seconds
-DEBUG:root:Received packet 59 at WAV time 7.552 seconds
-DEBUG:root:Received packet 60 at WAV time 7.680 seconds
-DEBUG:root:Received packet 61 at WAV time 7.808 seconds
-DEBUG:root:Received packet 62 at WAV time 7.936 seconds
-DEBUG:root:Received packet 63 at WAV time 8.064 seconds
-DEBUG:root:Received packet 64 at WAV time 8.192 seconds

@@ -9,57 +9,49 @@ DEBUG:root:Sent packet 7 at WAV time 0.896 seconds
 DEBUG:root:Sent packet 8 at WAV time 1.024 seconds
 DEBUG:root:Sent packet 9 at WAV time 1.152 seconds
 DEBUG:root:Sent packet 10 at WAV time 1.280 seconds
-DEBUG:root:Sent packet 11 at WAV time 1.408 seconds
+DEBUG:root:Sent partial empty packet (loss simulation) 11 at WAV time 1.408 seconds
 DEBUG:root:Sent packet 12 at WAV time 1.536 seconds
 DEBUG:root:Sent packet 13 at WAV time 1.664 seconds
 DEBUG:root:Sent packet 14 at WAV time 1.792 seconds
 DEBUG:root:Sent packet 15 at WAV time 1.920 seconds
 DEBUG:root:Sent packet 16 at WAV time 2.048 seconds
 DEBUG:root:Sent packet 17 at WAV time 2.176 seconds
-DEBUG:root:Sent empty packet (loss simulation) 18 at WAV time 2.304 seconds
+DEBUG:root:Sent packet 18 at WAV time 2.304 seconds
 DEBUG:root:Sent packet 19 at WAV time 2.432 seconds
 DEBUG:root:Sent packet 20 at WAV time 2.560 seconds
-DEBUG:root:Sent empty packet (loss simulation) 21 at WAV time 2.688 seconds
+DEBUG:root:Sent packet 21 at WAV time 2.688 seconds
 DEBUG:root:Sent packet 22 at WAV time 2.816 seconds
 DEBUG:root:Sent packet 23 at WAV time 2.944 seconds
 DEBUG:root:Sent packet 24 at WAV time 3.072 seconds
 DEBUG:root:Sent packet 25 at WAV time 3.200 seconds
 DEBUG:root:Sent packet 26 at WAV time 3.328 seconds
-DEBUG:root:Sent empty packet (loss simulation) 27 at WAV time 3.456 seconds
-DEBUG:root:Sent empty packet (loss simulation) 28 at WAV time 3.584 seconds
+DEBUG:root:Sent packet 27 at WAV time 3.456 seconds
+DEBUG:root:Sent packet 28 at WAV time 3.584 seconds
 DEBUG:root:Sent packet 29 at WAV time 3.712 seconds
 DEBUG:root:Sent packet 30 at WAV time 3.840 seconds
-DEBUG:root:Sent empty packet (loss simulation) 31 at WAV time 3.968 seconds
-DEBUG:root:Sent packet 32 at WAV time 4.096 seconds
+DEBUG:root:Sent packet 31 at WAV time 3.968 seconds
+DEBUG:root:Sent partial empty packet (loss simulation) 32 at WAV time 4.096 seconds
 DEBUG:root:Sent packet 33 at WAV time 4.224 seconds
 DEBUG:root:Sent packet 34 at WAV time 4.352 seconds
 DEBUG:root:Sent packet 35 at WAV time 4.480 seconds
-DEBUG:root:Sent empty packet (loss simulation) 36 at WAV time 4.608 seconds
+DEBUG:root:Sent packet 36 at WAV time 4.608 seconds
 DEBUG:root:Sent packet 37 at WAV time 4.736 seconds
 DEBUG:root:Sent packet 38 at WAV time 4.864 seconds
 DEBUG:root:Sent packet 39 at WAV time 4.992 seconds
 DEBUG:root:Sent packet 40 at WAV time 5.120 seconds
 DEBUG:root:Sent packet 41 at WAV time 5.248 seconds
 DEBUG:root:Sent packet 42 at WAV time 5.376 seconds
-DEBUG:root:Sent empty packet (loss simulation) 43 at WAV time 5.504 seconds
+DEBUG:root:Sent packet 43 at WAV time 5.504 seconds
 DEBUG:root:Sent packet 44 at WAV time 5.632 seconds
 DEBUG:root:Sent packet 45 at WAV time 5.760 seconds
 DEBUG:root:Sent packet 46 at WAV time 5.888 seconds
 DEBUG:root:Sent packet 47 at WAV time 6.016 seconds
-DEBUG:root:Sent empty packet (loss simulation) 48 at WAV time 6.144 seconds
-DEBUG:root:Sent empty packet (loss simulation) 49 at WAV time 6.272 seconds
+DEBUG:root:Sent packet 48 at WAV time 6.144 seconds
+DEBUG:root:Sent packet 49 at WAV time 6.272 seconds
 DEBUG:root:Sent packet 50 at WAV time 6.400 seconds
 DEBUG:root:Sent packet 51 at WAV time 6.528 seconds
 DEBUG:root:Sent packet 52 at WAV time 6.656 seconds
 DEBUG:root:Sent packet 53 at WAV time 6.784 seconds
-DEBUG:root:Sent empty packet (loss simulation) 54 at WAV time 6.912 seconds
+DEBUG:root:Sent partial empty packet (loss simulation) 54 at WAV time 6.912 seconds
 DEBUG:root:Sent packet 55 at WAV time 7.040 seconds
 DEBUG:root:Sent packet 56 at WAV time 7.168 seconds
-DEBUG:root:Sent packet 57 at WAV time 7.296 seconds
-DEBUG:root:Sent packet 58 at WAV time 7.424 seconds
-DEBUG:root:Sent packet 59 at WAV time 7.552 seconds
-DEBUG:root:Sent packet 60 at WAV time 7.680 seconds
-DEBUG:root:Sent packet 61 at WAV time 7.808 seconds
-DEBUG:root:Sent packet 62 at WAV time 7.936 seconds
-DEBUG:root:Sent packet 63 at WAV time 8.064 seconds
-DEBUG:root:Sent packet 64 at WAV time 8.192 seconds

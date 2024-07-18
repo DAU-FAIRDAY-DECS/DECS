@@ -31,8 +31,8 @@ def calculate_wav_length(wav_path):
 def send_audio():
     # WAV 파일의 길이 계산하여 패킷 손실 임계값 설정
     wav_length = calculate_wav_length("main/voip/wav/input.wav")
-    # 초기값 0.3초와 전체 길이의 5%를 중 작은 값을 최대 지속 시간으로 설정
-    max_loss_duration = min(0.3, 0.05 * wav_length)
+    # 최대 지속 시간 1초로 설정
+    max_loss_duration = 1.0
 
     # PyAudio 초기화 및 입력 스트림 열기
     p = pyaudio.PyAudio()
