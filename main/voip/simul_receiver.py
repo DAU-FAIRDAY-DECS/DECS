@@ -3,8 +3,6 @@ import socket
 import threading
 import wave
 import audioop
-import random
-import time
 import logging
 
 # 로깅 설정

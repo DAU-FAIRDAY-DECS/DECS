@@ -4,7 +4,6 @@ import threading
 import wave
 import audioop
 import random
-import time
 import logging
 
 # 로깅 설정
@@ -22,7 +21,19 @@ SENDER_CONTROL_PORT = 9002 # 송신자 제어 메시지 포트 번호
 RECEIVER_CONTROL_PORT = 9003 # 수신자 제어 메시지 포트 번호
 RECEIVER_IP = '192.168.25.3' # 수신자 IP 주소
 
+def calculate_wav_length(wav_path):
+    with wave.open(wav_path, 'rb') as wf:
+        frames = wf.getnframes()
+        rate = wf.getframerate()
+        duration = frames / float(rate)
+        return duration
+
 def send_audio():
+    # WAV 파일의 길이 계산하여 패킷 손실 임계값 설정
+    wav_length = calculate_wav_length("main/voip/wav/input.wav")
+    # 초기값 0.3초와 전체 길이의 5%를 중 작은 값을 최대 지속 시간으로 설정
+    max_loss_duration = min(0.3, 0.05 * wav_length)
+
     # PyAudio 초기화 및 입력 스트림 열기
     p = pyaudio.PyAudio()
     stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
@@ -61,9 +72,10 @@ def send_audio():
     control_thread.start()
 
     first_packet = True
+    packet_id = 0
+    last_loss_time = 0 # 마지막 패킷 손실 시간 기록
 
     try:
-        packet_id = 0
         while True:
             data = stream.read(CHUNK)
             wf.writeframes(data) # 입력 오디오 데이터를 파일에 저장
@@ -75,18 +87,19 @@ def send_audio():
             current_time = packet_id * (CHUNK / RATE)
             
             # 패킷 손실 시뮬레이션 (5% 확률로 약간의 빈 데이터 전송)
-            if random.random() > 0.95:
+            if random.random() > 0.95 and (current_time - last_loss_time > max_loss_duration):
                 # 전체 데이터의 20%만 빈 데이터로 채움
                 empty_data_portion = int(CHUNK * 0.2)
                 empty_data, _ = audioop.lin2adpcm(bytes([0] * empty_data_portion), 2, state)
                 # UDP 소켓을 통해 패킷 단위로 전송 (패킷화)
                 sock.sendto(empty_data, server_address)
+                last_loss_time = current_time
                 logging.debug(f'Sent partial empty packet (loss simulation) {packet_id} at WAV time {current_time:.3f} seconds')
             else:
                 # UDP 소켓을 통해 패킷 단위로 전송 (패킷화)
                 sock.sendto(compressed_data, server_address)
                 logging.debug(f'Sent packet {packet_id} at WAV time {current_time:.3f} seconds')
-                
+            
             # 첫 번째 패킷 전송 시 연결 시작 메시지 전송
             if first_packet:
                 control_sock.sendto(b"START", (RECEIVER_IP, RECEIVER_CONTROL_PORT))
