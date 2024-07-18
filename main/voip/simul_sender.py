@@ -74,19 +74,18 @@ def send_audio():
             # WAV 파일의 현재 시간 계산
             current_time = packet_id * (CHUNK / RATE)
             
-            # 패킷 손실 시뮬레이션 (10% 확률로 패킷 손실)
-            if random.random() > 0.1:
-                # 패킷 지연 시뮬레이션 (0-100ms 랜덤 지연)
-                time.sleep(random.uniform(0, 0.1))
+            # 패킷 손실 시뮬레이션 (5% 확률로 약간의 빈 데이터 전송)
+            if random.random() > 0.95:
+                # 전체 데이터의 20%만 빈 데이터로 채움
+                empty_data_portion = int(CHUNK * 0.2)
+                empty_data, _ = audioop.lin2adpcm(bytes([0] * empty_data_portion), 2, state)
+                # UDP 소켓을 통해 패킷 단위로 전송 (패킷화)
+                sock.sendto(empty_data, server_address)
+                logging.debug(f'Sent partial empty packet (loss simulation) {packet_id} at WAV time {current_time:.3f} seconds')
+            else:
                 # UDP 소켓을 통해 패킷 단위로 전송 (패킷화)
                 sock.sendto(compressed_data, server_address)
                 logging.debug(f'Sent packet {packet_id} at WAV time {current_time:.3f} seconds')
-            else:
-                # 패킷 손실 시 빈 데이터 전송
-                empty_data, _ = audioop.lin2adpcm(bytes([0] * CHUNK), 2, state)
-                # UDP 소켓을 통해 패킷 단위로 전송 (패킷화)
-                sock.sendto(empty_data, server_address)
-                logging.debug(f'Sent empty packet (loss simulation) {packet_id} at WAV time {current_time:.3f} seconds')
                 
             # 첫 번째 패킷 전송 시 연결 시작 메시지 전송
             if first_packet:

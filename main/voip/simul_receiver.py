@@ -66,10 +66,7 @@ def receive_audio():
         compressed_data, addr = sock.recvfrom(2048)
         control_sock.sendto(b"START", (SENDER_IP, SENDER_CONTROL_PORT)) # 연결 시작 메시지 전송
         print("오디오 수신 중")
-        while True:
-            # 패킷 지연 시뮬레이션 (0-100ms 랜덤 지연)
-            time.sleep(random.uniform(0, 0.1))
-            
+        while True:            
             # ADPCM 데이터를 PCM 데이터로 압축 해제 (압축 해제)
             data, state = audioop.adpcm2lin(compressed_data, 2, state)
             wf.writeframes(data) # 출력 오디오 데이터를 파일에 저장
