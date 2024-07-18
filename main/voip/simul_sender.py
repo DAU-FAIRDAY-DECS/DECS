@@ -37,13 +37,13 @@ def send_audio():
     # PyAudio 초기화 및 입력 스트림 열기
     p = pyaudio.PyAudio()
     stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
-    
+
     # UDP 소켓 생성
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     control_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     control_sock.bind(('0.0.0.0', SENDER_CONTROL_PORT))
     server_address = (RECEIVER_IP, PORT)
-    
+
     print("오디오 송신 중")
 
     # 입력 오디오 데이터를 저장할 wave 파일 생성
@@ -82,10 +82,10 @@ def send_audio():
 
             # PCM 데이터를 ADPCM 데이터로 압축 (압축화)
             compressed_data, state = audioop.lin2adpcm(data, 2, state)
-            
+
             # WAV 파일의 현재 시간 계산
             current_time = packet_id * (CHUNK / RATE)
-            
+
             # 패킷 손실 시뮬레이션 (5% 확률로 약간의 빈 데이터 전송)
             if random.random() > 0.95 and (current_time - last_loss_time > max_loss_duration):
                 # 전체 데이터의 20%만 빈 데이터로 채움
@@ -94,17 +94,17 @@ def send_audio():
                 # UDP 소켓을 통해 패킷 단위로 전송 (패킷화)
                 sock.sendto(empty_data, server_address)
                 last_loss_time = current_time
-                logging.debug(f'Sent partial empty packet (loss simulation) {packet_id} at WAV time {current_time:.3f} seconds')
+                logging.debug(f'Sent partial empty packet (loss simulation) {packet_id} at time {current_time:.3f} seconds')
             else:
                 # UDP 소켓을 통해 패킷 단위로 전송 (패킷화)
                 sock.sendto(compressed_data, server_address)
-                logging.debug(f'Sent packet {packet_id} at WAV time {current_time:.3f} seconds')
-            
+                logging.debug(f'Sent packet {packet_id} at time {current_time:.3f} seconds')
+
             # 첫 번째 패킷 전송 시 연결 시작 메시지 전송
             if first_packet:
                 control_sock.sendto(b"START", (RECEIVER_IP, RECEIVER_CONTROL_PORT))
                 first_packet = False
-            
+
             packet_id += 1
     except KeyboardInterrupt:
         control_sock.sendto(b"END", (RECEIVER_IP, RECEIVER_CONTROL_PORT))
