@@ -1,5 +1,6 @@
 import random
 from pydub import AudioSegment
+import os
 
 def simulate_random_packet_loss(audio, min_loss_length_ms=100, max_loss_length_ms=500, loss_probability=0.1):
     """
@@ -32,13 +33,26 @@ def simulate_random_packet_loss(audio, min_loss_length_ms=100, max_loss_length_m
 
     return output_audio
 
-# 기존 오디오 파일 로드
-audio_path = "main/voip/wav/0030.wav"
-original_audio = AudioSegment.from_file(audio_path, format="wav")
+def process_all_audio_files(input_directory, output_directory):
+    # 지정된 폴더의 모든 WAV 파일을 찾아서 처리
+    for filename in os.listdir(input_directory):
+        if filename.endswith(".wav"):
+            file_path = os.path.join(input_directory, filename)
+            output_filename = filename.split('.')[0] + '-loss.wav'
+            output_path = os.path.join(output_directory, output_filename)
 
-# 오디오에서 패킷 손실 시뮬레이션
-audio_with_packet_loss = simulate_random_packet_loss(original_audio)
+            # 오디오 파일 로드
+            original_audio = AudioSegment.from_file(file_path, format="wav")
 
-# 조작된 오디오 내보내기
-output_path = "main/voip/sample/new/0030-loss.wav"
-audio_with_packet_loss.export(output_path, format="wav")
+            # 패킷 손실 시뮬레이션 적용
+            audio_with_packet_loss = simulate_random_packet_loss(original_audio)
+
+            # 조작된 오디오 내보내기
+            audio_with_packet_loss.export(output_path, format="wav")
+
+# input_directory와 output_directory 경로 설정
+input_directory = "main/voip/wav"
+output_directory = "main/voip/sample/new"
+
+# 모든 파일에 대한 처리 시작
+process_all_audio_files(input_directory, output_directory)
