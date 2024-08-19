@@ -1,60 +1,40 @@
-import numpy as np
 import librosa
-import os
+import numpy as np
 
-def save_feature_to_file(feature, filename):
-    np.savetxt(filename, np.round(feature, 3), fmt='%.3f')
-
-def extract_audio_features_per_frame(file_path, output_dir, frame_size=1024, hop_length=512):
-    # Load audio file
+def extract_audio_features(file_path):
+    # WAV 파일 로드
     y, sr = librosa.load(file_path, sr=None)
 
-    # Ensure output directory exists
-    os.makedirs(output_dir, exist_ok=True)
+    # 프레임 크기와 홉 크기 정의
+    frame_length = 1024
+    hop_length = 512
 
-    # Initialize lists to store features for each frame
-    energy_list = []
-    zero_crossing_rate_list = []
-    fundamental_frequency_list = []
-    spectral_centroid_list = []
-    spectral_bandwidth_list = []
-    spectral_rolloff_list = []
+    # 시간 도메인 특징 추출
+    # 1. 에너지
+    energy = librosa.feature.rms(y=y, frame_length=frame_length, hop_length=hop_length)
+    np.savetxt("main/autoencoder/feature/1에너지.txt", energy.T, fmt='%.4f')
 
-    # Process each frame
-    for i in range(0, len(y) - frame_size + 1, hop_length):
-        frame = y[i:i + frame_size]
+    # 2. 영점 교차율 (Zero Crossing Rate)
+    zcr = librosa.feature.zero_crossing_rate(y=y, frame_length=frame_length, hop_length=hop_length)
+    np.savetxt("main/autoencoder/feature/2교차율.txt", zcr.T, fmt='%.4f')
 
-        # Time-domain features
-        energy = np.sum(np.square(frame))
-        energy_list.append(energy)
+    # 3. 기본 주파수 (F0)
+    f0, voiced_flag, voiced_probs = librosa.pyin(y, fmin=librosa.note_to_hz('C2'), fmax=librosa.note_to_hz('C7'))
+    f0 = np.nan_to_num(f0)
+    np.savetxt("main/autoencoder/feature/3주파수.txt", f0, fmt='%.4f', delimiter='\n')
 
-        zero_crossings = librosa.feature.zero_crossing_rate(frame, frame_length=frame_size, hop_length=hop_length)
-        zero_crossing_rate_list.append(zero_crossings.mean())
+    # 주파수 도메인 특징 추출
+    # 1. 스펙트럼 중심
+    spectral_centroids = librosa.feature.spectral_centroid(y=y, sr=sr, n_fft=frame_length, hop_length=hop_length)
+    np.savetxt("main/autoencoder/feature/4중심.txt", spectral_centroids.T, fmt='%.4f')
 
-        f0, voiced_flag, voiced_probs = librosa.pyin(frame, fmin=librosa.note_to_hz('C2'), fmax=librosa.note_to_hz('C7'), sr=sr)
-        f0 = f0[~np.isnan(f0)]
-        fundamental_freq = f0.mean() if len(f0) > 0 else 0
-        fundamental_frequency_list.append(fundamental_freq)
+    # 2. 스펙트럼 대역폭
+    spectral_bandwidth = librosa.feature.spectral_bandwidth(y=y, sr=sr, n_fft=frame_length, hop_length=hop_length)
+    np.savetxt("main/autoencoder/feature/5대역.txt", spectral_bandwidth.T, fmt='%.4f')
 
-        # Frequency-domain features
-        spectral_centroid = librosa.feature.spectral_centroid(y=frame, sr=sr)
-        spectral_centroid_list.append(spectral_centroid.mean())
+    # 3. 스펙트럼 롤오프
+    spectral_rolloff = librosa.feature.spectral_rolloff(y=y, sr=sr, n_fft=frame_length, hop_length=hop_length)
+    np.savetxt("main/autoencoder/feature/6롤옾.txt", spectral_rolloff.T, fmt='%.4f')
 
-        spectral_bandwidth = librosa.feature.spectral_bandwidth(y=frame, sr=sr)
-        spectral_bandwidth_list.append(spectral_bandwidth.mean())
-
-        spectral_rolloff = librosa.feature.spectral_rolloff(y=frame, sr=sr, roll_percent=0.85)
-        spectral_rolloff_list.append(spectral_rolloff.mean())
-
-    # Save all extracted features to respective files with rounding and formatting
-    save_feature_to_file(energy_list, os.path.join(output_dir, 'energy_per_frame.txt'))
-    save_feature_to_file(zero_crossing_rate_list, os.path.join(output_dir, 'zero_crossing_rate_per_frame.txt'))
-    save_feature_to_file(fundamental_frequency_list, os.path.join(output_dir, 'fundamental_frequency_per_frame.txt'))
-    save_feature_to_file(spectral_centroid_list, os.path.join(output_dir, 'spectral_centroid_per_frame.txt'))
-    save_feature_to_file(spectral_bandwidth_list, os.path.join(output_dir, 'spectral_bandwidth_per_frame.txt'))
-    save_feature_to_file(spectral_rolloff_list, os.path.join(output_dir, 'spectral_rolloff_per_frame.txt'))
-
-# Example usage
-input_wav_file = '/Volumes/JMJ_SSD/wavFeatures/noiseMixedWav/output0001.wav'  # Replace with your .wav file path
-output_directory = 'features_output_per_frame'
-extract_audio_features_per_frame(input_wav_file, output_directory)
+if __name__ == "__main__":
+    extract_audio_features("00003.wav")
