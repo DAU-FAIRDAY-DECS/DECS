@@ -58,18 +58,17 @@ def extract_features(file_path, target_length=2048):
     else:
         y = y[:target_length]
 
-    # 특징 추출
+    energy = np.square(y)
     pitch = librosa.yin(y, fmin=50, fmax=300)
-    intensity = librosa.feature.rms(y=y)[0]
     zcr = librosa.feature.zero_crossing_rate(y)[0]
 
     # 모든 특징의 길이를 맞추기 위해 자르거나 패딩
+    energy = np.pad(energy, (0, target_length - len(energy)), 'constant')
     pitch = np.pad(pitch, (0, target_length - len(pitch)), 'constant')
-    intensity = np.pad(intensity, (0, target_length - len(intensity)), 'constant')
     zcr = np.pad(zcr, (0, target_length - len(zcr)), 'constant')
 
     # 특징 결합
-    features = np.vstack((pitch, intensity, zcr)).T
+    features = np.vstack((energy, pitch, zcr)).T
     return features
 
 # 데이터 로드 함수
@@ -122,36 +121,26 @@ axes.set_ylabel('Number of Samples')
 axes.legend()
 
 plt.suptitle('Reconstruction Error Distribution - Conv AE')
-#plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.show()
 
 # 혼동 행렬 계산 및 시각화
 threshold = np.percentile(mse_test, 95)
-y_pred = (mse_test > threshold).astype(int)
+threshold_fixed = 60
+y_pred = (mse_test > threshold_fixed).astype(int)
 conf_matrix = confusion_matrix(y_test, y_pred)
 disp = ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=['Normal', 'Abnormal'])
 disp.plot(cmap=plt.cm.Blues)
 plt.show()
 
-# 재구성 오류 및 임계값 범위 탐색 그래프
-fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(7, 7))
-axes.scatter(range(len(mse_test[y_test == 0])), mse_test[y_test == 0], c='blue', label='Normal - Conv AE')
-axes.scatter(range(len(mse_test[y_test == 1])), mse_test[y_test == 1], c='orange', label='Abnormal - Conv AE')
-#axes.fill_between(range(len(mse_test)), np.percentile(mse_test, 95), max(mse_test), color='orange', alpha=0.3, label='Threshold Range - Conv AE')
-axes.set_title('Threshold Range Exploration - Conv AE')
-axes.set_xlabel('Samples')
-axes.set_ylabel('Reconstruction Error')
-axes.set_ylim(0, 0.003)
-axes.legend()
+# # 임계값 임계값 임계값 임계값 임계값
+# fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(7, 7))
+# axes.scatter(range(len(mse_test[y_test == 0])), mse_test[y_test == 0], c='blue', label='Normal - Conv AE')
+# axes.scatter(range(len(mse_test[y_test == 1])), mse_test[y_test == 1], c='orange', label='Abnormal - Conv AE')
+# axes.fill_between(range(len(mse_test)), threshold_fixed, max(mse_test), color='orange', alpha=0.3, label='Threshold Range - Conv AE')
+# axes.set_title('Threshold Range Exploration - Conv AE')
+# axes.set_xlabel('Samples')
+# axes.set_ylabel('Reconstruction Error')
+# axes.legend()
 
-plt.tight_layout()
-plt.show()
-
-# 혼동 행렬 계산 및 시각화 (임계값 0.001)
-threshold_fixed = 0.001
-y_pred_fixed = (mse_test > threshold_fixed).astype(int)
-conf_matrix_fixed = confusion_matrix(y_test, y_pred_fixed)
-disp_fixed = ConfusionMatrixDisplay(confusion_matrix=conf_matrix_fixed, display_labels=['Normal', 'Abnormal'])
-disp_fixed.plot(cmap=plt.cm.Blues)
-plt.title(f'Confusion Matrix with Fixed Threshold (0.001)')
-plt.show()
+# plt.tight_layout()
+# plt.show()
