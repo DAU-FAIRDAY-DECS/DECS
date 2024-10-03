@@ -7,47 +7,72 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from keras.layers import Input, Conv1D, MaxPooling1D, UpSampling1D, BatchNormalization, Dropout
 from keras.models import Model
 
-# 컨볼루션 오토인코더 정의
+# 컨볼루션 오토인코더 정의 (복잡성 증가 버전)
 def convolutional_autoencoder():
     input_audio = Input(shape=(2048, 3))
-    x = Conv1D(64, 3, activation='relu', padding='same')(input_audio)
+    
+    # 인코더
+    x = Conv1D(128, 5, activation='relu', padding='same')(input_audio)  # 필터 수 128, 커널 크기 5
     x = BatchNormalization()(x)
-    x = Dropout(0.25)(x)
-    x = Conv1D(64, 3, activation='relu', padding='same')(x)
-    x = BatchNormalization()(x)
-    x = MaxPooling1D(2, padding='same')(x)
-    x = Conv1D(32, 3, activation='relu', padding='same')(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.25)(x)
-    x = Conv1D(32, 3, activation='relu', padding='same')(x)
+    x = Dropout(0.3)(x)  # Dropout 증가
+    x = Conv1D(128, 5, activation='relu', padding='same')(x)
     x = BatchNormalization()(x)
     x = MaxPooling1D(2, padding='same')(x)
-    x = Conv1D(16, 3, activation='relu', padding='same')(x)
+
+    x = Conv1D(64, 5, activation='relu', padding='same')(x)  # 필터 수 64
     x = BatchNormalization()(x)
-    x = Dropout(0.25)(x)
-    x = Conv1D(16, 3, activation='relu', padding='same')(x)
+    x = Dropout(0.3)(x)
+    x = Conv1D(64, 5, activation='relu', padding='same')(x)
     x = BatchNormalization()(x)
     x = MaxPooling1D(2, padding='same')(x)
-    encoded = Conv1D(8, 3, activation='relu', padding='same')(x)
-    x = Conv1D(16, 3, activation='relu', padding='same')(encoded)
+
+    x = Conv1D(32, 5, activation='relu', padding='same')(x)  # 필터 수 32
     x = BatchNormalization()(x)
-    x = Dropout(0.25)(x)
-    x = Conv1D(16, 3, activation='relu', padding='same')(x)
+    x = Dropout(0.3)(x)
+    x = Conv1D(32, 5, activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(2, padding='same')(x)
+
+    x = Conv1D(16, 5, activation='relu', padding='same')(x)  # 필터 수 16
+    x = BatchNormalization()(x)
+    x = Dropout(0.3)(x)
+    x = Conv1D(16, 5, activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(2, padding='same')(x)
+
+    encoded = Conv1D(8, 5, activation='relu', padding='same')(x)  # 더 깊이 추가된 인코더
+
+    # 디코더
+    x = Conv1D(16, 5, activation='relu', padding='same')(encoded)  # 필터 수 16
+    x = BatchNormalization()(x)
+    x = Dropout(0.3)(x)
+    x = Conv1D(16, 5, activation='relu', padding='same')(x)
     x = BatchNormalization()(x)
     x = UpSampling1D(2)(x)
-    x = Conv1D(32, 3, activation='relu', padding='same')(x)
+
+    x = Conv1D(32, 5, activation='relu', padding='same')(x)  # 필터 수 32
     x = BatchNormalization()(x)
-    x = Dropout(0.25)(x)
-    x = Conv1D(32, 3, activation='relu', padding='same')(x)
-    x = BatchNormalization()(x)
-    x = UpSampling1D(2)(x)
-    x = Conv1D(64, 3, activation='relu', padding='same')(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.25)(x)
-    x = Conv1D(64, 3, activation='relu', padding='same')(x)
+    x = Dropout(0.3)(x)
+    x = Conv1D(32, 5, activation='relu', padding='same')(x)
     x = BatchNormalization()(x)
     x = UpSampling1D(2)(x)
-    decoded = Conv1D(3, 3, activation='sigmoid', padding='same')(x)
+
+    x = Conv1D(64, 5, activation='relu', padding='same')(x)  # 필터 수 64
+    x = BatchNormalization()(x)
+    x = Dropout(0.3)(x)
+    x = Conv1D(64, 5, activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
+    x = UpSampling1D(2)(x)
+
+    x = Conv1D(128, 5, activation='relu', padding='same')(x)  # 필터 수 128
+    x = BatchNormalization()(x)
+    x = Dropout(0.3)(x)
+    x = Conv1D(128, 5, activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
+    x = UpSampling1D(2)(x)
+
+    decoded = Conv1D(3, 5, activation='sigmoid', padding='same')(x)
+
     return Model(input_audio, decoded)
 
 # 특징 추출 함수
@@ -101,7 +126,7 @@ X_train, X_val = train_test_split(train_normal_data, test_size=0.2, random_state
 # 모델 훈련
 model = convolutional_autoencoder()
 model.compile(optimizer='adam', loss='mse')
-model.fit(X_train, X_train, epochs=1, batch_size=10, validation_data=(X_val, X_val))
+model.fit(X_train, X_train, epochs=10, batch_size=10, validation_data=(X_val, X_val))
 
 # 테스트 데이터 준비 및 평가
 X_test = np.concatenate((test_normal_data, test_abnormal_data))
@@ -144,3 +169,42 @@ plt.show()
 
 # plt.tight_layout()
 # plt.show()
+
+# WAV 파일 간의 재구성 오차(오차율) 계산 함수 (최대값 기준)
+def calculate_error_rate_max_based(original_wav_path, noisy_wav_path):
+    # 두 파일 로드
+    y_original, sr_original = librosa.load(original_wav_path, sr=None)
+    y_noisy, sr_noisy = librosa.load(noisy_wav_path, sr=None)
+
+    # 두 파일의 샘플링 레이트가 다를 경우 재샘플링
+    if sr_original != sr_noisy:
+        y_noisy = librosa.resample(y_noisy, sr_noisy, sr_original)
+
+    # 두 파일의 길이가 다를 경우, 짧은 파일 기준으로 길이를 맞춤
+    min_len = min(len(y_original), len(y_noisy))
+    y_original = y_original[:min_len]
+    y_noisy = y_noisy[:min_len]
+
+    # MSE (Mean Squared Error) 계산
+    mse = np.mean(np.square(y_original - y_noisy))
+
+    # MAE (Mean Absolute Error) 계산
+    mae = np.mean(np.abs(y_original - y_noisy))
+
+    # 오차율 계산 (원본 데이터의 최대값을 기준으로)
+    original_max = np.mean(np.abs(y_original))
+    
+    mse_error_rate = (mse / original_max) * 100  # MSE 오차율 (백분율)
+    mae_error_rate = (mae / original_max) * 100  # MAE 오차율 (백분율)
+
+    return mse_error_rate, mae_error_rate
+
+# 원본 파일과 노이즈 섞인 파일 경로
+original_wav_path = 't_error/original/input15.wav'
+noisy_wav_path = 't_error/noise/output15.wav'
+
+# 오차율 계산 (최대값 기준)
+mse_error_rate, mae_error_rate = calculate_error_rate_max_based(original_wav_path, noisy_wav_path)
+
+print(f"MSE Error Rate (Max-based): {mse_error_rate:.2f}%")
+print(f"MAE Error Rate (Max-based): {mae_error_rate:.2f}%")
