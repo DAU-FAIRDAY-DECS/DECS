@@ -192,7 +192,7 @@ def calculate_error_rate_max_based(original_wav_path, noisy_wav_path):
     mae = np.mean(np.abs(y_original - y_noisy))
 
     # 오차율 계산 (원본 데이터의 최대값을 기준으로)
-    original_max = np.mean(np.abs(y_original))
+    original_max = np.max(np.abs(y_original))
     
     mse_error_rate = (mse / original_max) * 100  # MSE 오차율 (백분율)
     mae_error_rate = (mae / original_max) * 100  # MAE 오차율 (백분율)
