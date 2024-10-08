@@ -1,10 +1,11 @@
 import numpy as np
 import librosa
 import os
+import matplotlib.pyplot as plt
 from keras.models import load_model
 
 # 모델 경로
-model_path = 't_save/preprocessing_autoencoder_model.h5'
+model_path = 't_save/preprocessing_autoencoder_model.keras'
 
 # WAV 파일 간의 재구성 오차(오차율) 계산 함수 (최대값 기준)
 def calculate_error_rate_max_based(noisy_wav_path, model):
@@ -23,13 +24,13 @@ def calculate_error_rate_max_based(noisy_wav_path, model):
     reconstructions = np.squeeze(reconstructions)
     
     # MSE (Mean Squared Error) 계산
-    mse = np.mean(np.square(y_noisy - reconstructions))
+    mse = np.mean(np.square(reconstructions - y_noisy))
 
     # MAE (Mean Absolute Error) 계산
-    mae = np.mean(np.abs(y_noisy - reconstructions))
+    mae = np.mean(np.abs(reconstructions - y_noisy))
 
     # 오차율 계산 (원본 데이터의 최대값을 기준으로)
-    noisy_max = np.max(np.abs(y_noisy))
+    noisy_max = np.max(np.abs(reconstructions))
 
     mse_error_rate = (mse / noisy_max) * 100  # MSE 오차율 (백분율)
     mae_error_rate = (mae / noisy_max) * 100  # MAE 오차율 (백분율)
@@ -57,7 +58,7 @@ def extract_features(file_path, target_length=2048):
     return features
 
 # 노이즈 섞인 파일 경로
-noisy_wav_path = 't_error/noise/output.wav'
+noisy_wav_path = 't_error/noise/output3.wav'
 
 # 모델 로드
 if os.path.exists(model_path):

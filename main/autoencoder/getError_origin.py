@@ -52,8 +52,8 @@ def extract_features(file_path, target_length=2048):
     return features
 
 # 원본 파일과 노이즈 섞인 파일 경로
-original_wav_path = 't_error/original/input15.wav'
-noisy_wav_path = 't_error/noise/output15.wav'
+original_wav_path = 't_error/original/input3.wav'
+noisy_wav_path = 't_error/noise/output3.wav'
 
 # 오차율 계산 (최대값 기준)
 mse_error_rate, mae_error_rate = calculate_error_rate_max_based(original_wav_path, noisy_wav_path)

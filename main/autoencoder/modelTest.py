@@ -49,7 +49,7 @@ test_normal_data = np.expand_dims(test_normal_data, axis=-1)
 test_abnormal_data = np.expand_dims(test_abnormal_data, axis=-1)
 
 # 모델 로드
-model_path = 't_save/preprocessing_autoencoder_model.h5'
+model_path = 't_save/preprocessing_autoencoder_model.keras'
 model = load_model(model_path)
 print(f"Loaded model from {model_path}.")
 

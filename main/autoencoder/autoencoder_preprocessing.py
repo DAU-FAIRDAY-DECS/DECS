@@ -122,7 +122,7 @@ train_normal_data = np.expand_dims(train_normal_data, axis=-1)
 X_train, X_val = train_test_split(train_normal_data, test_size=0.2, random_state=42)
 
 # 모델 저장 경로
-model_path = 't_save/preprocessing_autoencoder_model.h5'
+model_path = 't_save/preprocessing_autoencoder_model.keras'
 
 # 모델 로드 또는 생성
 if os.path.exists(model_path):
@@ -137,7 +137,7 @@ else:
     early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
 
     # 모델 훈련
-    model.fit(X_train, X_train, epochs=10, batch_size=10, validation_data=(X_val, X_val), callbacks=[reduce_lr, early_stopping])
+    model.fit(X_train, X_train, epochs=50, batch_size=10, validation_data=(X_val, X_val), callbacks=[reduce_lr, early_stopping])
     
     # 모델 저장
     model.save(model_path)
