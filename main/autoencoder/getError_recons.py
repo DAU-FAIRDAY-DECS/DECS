@@ -58,7 +58,7 @@ def extract_features(file_path, target_length=2048):
     return features
 
 # 노이즈 섞인 파일 경로
-noisy_wav_path = 't_error/noise/output3.wav'
+noisy_wav_path = 't_error/noise/output13.wav'
 
 # 모델 로드
 if os.path.exists(model_path):

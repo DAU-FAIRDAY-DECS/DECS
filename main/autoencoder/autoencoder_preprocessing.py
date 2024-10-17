@@ -137,7 +137,7 @@ else:
     early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
 
     # 모델 훈련
-    model.fit(X_train, X_train, epochs=50, batch_size=10, validation_data=(X_val, X_val), callbacks=[reduce_lr, early_stopping])
+    model.fit(X_train, X_train, epochs=50, batch_size=5, validation_data=(X_val, X_val), callbacks=[reduce_lr, early_stopping])
     
     # 모델 저장
     model.save(model_path)

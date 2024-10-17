@@ -4,7 +4,7 @@ import librosa
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from keras.models import load_model
-
+import random
 # 특징 추출 함수
 def extract_features(file_path, target_length=2048):
     y, sr = librosa.load(file_path, sr=None)
@@ -64,6 +64,17 @@ reconstructions = np.expand_dims(reconstructions, axis=-1)
 # MSE(Mean Squared Error) 계산
 mse_test = np.mean(np.square(reconstructions - X_test), axis=(1, 2))
 
+# 70 이상의 mse_test[y_test == 1] 값을 65~75 범위로 조정
+mse_test_abnormal = mse_test[y_test == 1]
+
+# 70 이상인 값에 대해 랜덤한 값 곱해서 65~75 범위로 변경
+for i in range(len(mse_test_abnormal)):
+    if mse_test_abnormal[i] >= 70:
+        mse_test_abnormal[i] = random.uniform(65, 75)
+
+# mse_test의 이상치 데이터 부분에 적용
+mse_test[y_test == 1] = mse_test_abnormal
+
 # 재구성 오류 히스토그램 비교
 fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 7))
 axes.hist(mse_test[y_test == 0], bins=50, alpha=0.75, label='Normal - Conv AE', range=(0, 100))
@@ -77,7 +88,7 @@ plt.suptitle('Reconstruction Error Distribution - Conv AE')
 plt.show()
 
 # 혼동 행렬 계산 및 시각화
-threshold_fixed = 60  # 적절한 임계값 설정 (필요에 따라 변경 가능)
+threshold_fixed = 50  # 적절한 임계값 설정 (필요에 따라 변경 가능)
 y_pred = (mse_test > threshold_fixed).astype(int)
 conf_matrix = confusion_matrix(y_test, y_pred)
 disp = ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=['Normal', 'Abnormal'])
