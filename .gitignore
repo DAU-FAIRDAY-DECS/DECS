@@ -8,6 +8,6 @@
 /DCASE/dev_data/
 /DCASE/eval_data/
 /DCASE/model/
-/baseline.log/
-/DCASE/baseline.log/
+/baseline.log
+/DCASE/baseline.log
 /DCASE/_pycache__/
