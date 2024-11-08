@@ -3,10 +3,9 @@ eval_directory: ../eval_data
 model_directory: ./model
 result_directory: ./result
 result_file: result.csv
-#common select_dirs() path
 
 max_fpr: 0.1
-decision_threshold: 0.95
+decision_threshold: 0.9
 
 feature:
   n_mels: 128
@@ -18,8 +17,8 @@ feature:
 
 fit:
   lr: 0.001
-  epochs: 100
-  batch_size: 64
+  epochs: 10
+  batch_size: 10
   shuffle: True
   validation_split: 0.1
   verbose: 1

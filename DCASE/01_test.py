@@ -94,7 +94,9 @@ if __name__ == "__main__":
         shape_hat, loc_hat, scale_hat = joblib.load(score_distr_file_path)
 
         # determine threshold for decision
-        decision_threshold = scipy.stats.gamma.ppf(q=param["decision_threshold"], a=shape_hat, loc=loc_hat, scale=scale_hat)
+        #decision_threshold = scipy.stats.gamma.ppf(q=param["decision_threshold"], a=shape_hat, loc=loc_hat, scale=scale_hat)
+        decision_threshold = 40
+        print("Decision Threshold:", decision_threshold)
 
         if mode:
             # results for each machine type
@@ -240,7 +242,6 @@ if __name__ == "__main__":
             hmean_performance = scipy.stats.hmean(np.maximum(np.array(performance, dtype=float), sys.float_info.epsilon), axis=0)
             csv_lines.append(["harmonic mean"] + list(hmean_performance))
             csv_lines.append([])
-            csv_lines.append(["Decision Threshold:" , decision_threshold])
 
         del data
         del model
@@ -248,7 +249,7 @@ if __name__ == "__main__":
         gc.collect()
 
     if mode:
-        csv_lines.append(["", "AUC (source)", "pAUC", "precision (source)", "recall (source)", "F1 score (source)"])      
+        csv_lines.append(["", "", "", "precision (source)", "recall (source)", "F1 score (source)"])      
                           
         # calculate averages for AUCs and pAUCs                        
         amean_performance = np.mean(np.array(performance_over_all, dtype=float), axis=0)
@@ -256,6 +257,7 @@ if __name__ == "__main__":
         hmean_performance = scipy.stats.hmean(np.maximum(np.array(performance_over_all, dtype=float), sys.float_info.epsilon), axis=0)
         csv_lines.append(["harmonic mean over all machine types, sections, and domains"] + list(hmean_performance))
         csv_lines.append([])
+        csv_lines.append(["Decision Threshold:" , decision_threshold])
         
         # output results
         result_path = "{result}/{file_name}".format(result=param["result_directory"], file_name=param["result_file"])
