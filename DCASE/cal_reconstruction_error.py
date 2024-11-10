@@ -1,65 +1,61 @@
 import os
+import sys
+
 import numpy as np
 import scipy.stats
+
 import joblib
-import keras_model
 import common as com
+import keras_model
 
-# 필요한 파라미터 로드
-param = com.yaml_load()
+param = com.yaml_load() 
 
-def calculate_reconstruction_error(wav_path, model, n_mels=64, n_frames=512, n_fft=1024, hop_length=512, power=2.0):
+#Calculate reconstruction error for a single wav file
+def calculate_reconstruction_error(file_path, model, decision_threshold):
     try:
-        # WAV 파일을 벡터로 변환 (멜 스펙트로그램으로 변환)
-        data = com.file_to_vectors(wav_path,
-                                    n_mels=n_mels,
-                                    n_frames=n_frames,
-                                    n_fft=n_fft,
-                                    hop_length=hop_length,
-                                    power=power)
-        
-        print(f"Data shape: {data.shape}")
-        print(f"Data mean: {np.mean(data)}, std: {np.std(data)}")
-        
-        # 모델 예측 수행
-        reconstruction = model.predict(data)
-        
-        print(f"Reconstruction shape: {reconstruction.shape}")
-        print(f"Reconstruction mean: {np.mean(reconstruction)}, std: {np.std(reconstruction)}")
-        
-        # 재구성 오차 계산 (MSE 방식)
-        reconstruction_error = np.mean(np.square(data - reconstruction))
-        
-        if np.isnan(reconstruction_error) or np.isinf(reconstruction_error):
-            print("Invalid reconstruction error")
-            return None
-        
-        return reconstruction_error
+        data = com.file_to_vectors(
+            file_name=file_path,
+            n_mels=param["feature"]["n_mels"],
+            n_frames=param["feature"]["n_frames"],
+            n_fft=param["feature"]["n_fft"],
+            hop_length=param["feature"]["hop_length"],
+            power=param["feature"]["power"]
+        )
+
+        reconstructed = model.predict(data)
+
+        mse = np.mean(np.square(data - reconstructed))
+
+        print(f"Reconstruction Error (MSE): {mse:.4f}")
+        if mse > decision_threshold:
+            print(f"Anomaly Detected!")
+        else:
+            print(f"Normal!")
+
+        return mse
+
     except Exception as e:
-        print(f"Error processing file {wav_path}: {e}")
+        print(f"Error processing file {file_path}: {e}")
         return None
 
-
 if __name__ == "__main__":
-    # WAV 파일 경로 설정
-    wav_path = "output9.wav"  # 여기에 실제 파일 경로를 입력하세요
 
-    # 모델 로드
-    model_file = "{model}/model_human.keras".format(model=param["model_directory"])
+    file_path = "dev_data\\human\\test\\0001-loss.wav"
+
+
+    model_file = f"{param['model_directory']}/model_human_100_64.keras"
+    score_distr_file = f"{param['model_directory']}/score_distr_human.pkl"
+    
+    # Load model
     if not os.path.exists(model_file):
         print(f"Model file {model_file} not found!")
-        exit(-1)
+        sys.exit(-1)
     
     model = keras_model.load_model(model_file)
     model.summary()
 
-    # 재구성 오차 계산
-    error = calculate_reconstruction_error(wav_path, model)
-    
-    if error is not None:
-        print(f"Reconstruction Error for {wav_path}: {error}")
-    else:
-        print("Failed to calculate reconstruction error.")
-    
-    # 모델과 세션 정리
-    keras_model.clear_session()
+    shape_hat, loc_hat, scale_hat = joblib.load(score_distr_file)
+    decision_threshold = 40 #scipy.stats.gamma.ppf(q=param["decision_threshold"], a=shape_hat, loc=loc_hat, scale=scale_hat)
+    print(f"Loaded Decision Threshold: {decision_threshold}")
+
+    calculate_reconstruction_error(file_path, model, decision_threshold)
