@@ -11,3 +11,5 @@
 /baseline.log
 /DCASE/baseline.log
 /DCASE/_pycache__/
+/DCASE/*.wav
+/DCASE/*.png
