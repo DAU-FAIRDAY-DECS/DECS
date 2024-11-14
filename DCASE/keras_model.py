@@ -14,8 +14,7 @@ import tensorflow as tf
 def get_model(input_dim, lr):
     """
     define the keras model
-    the model based on the simple dense auto encoder 
-    (128*128*128*128*8*128*128*128*128)
+    (128*64*32*16*8*16*32*64*128)
     """
 
     x = Input(shape=(input_dim,))
@@ -24,15 +23,15 @@ def get_model(input_dim, lr):
     h = BatchNormalization()(h)
     h = Activation('relu')(h)
 
-    h = Dense(128)(h)
+    h = Dense(64)(h)
     h = BatchNormalization()(h)
     h = Activation('relu')(h)
 
-    h = Dense(128)(h)
+    h = Dense(32)(h)
     h = BatchNormalization()(h)
     h = Activation('relu')(h)
 
-    h = Dense(128)(h)
+    h = Dense(16)(h)
     h = BatchNormalization()(h)
     h = Activation('relu')(h)
 
@@ -40,15 +39,15 @@ def get_model(input_dim, lr):
     h = BatchNormalization()(h)
     h = Activation('relu')(h)
     
-    h = Dense(128)(h)
+    h = Dense(16)(h)
     h = BatchNormalization()(h)
     h = Activation('relu')(h)
 
-    h = Dense(128)(h)
+    h = Dense(32)(h)
     h = BatchNormalization()(h)
     h = Activation('relu')(h)
 
-    h = Dense(128)(h)
+    h = Dense(64)(h)
     h = BatchNormalization()(h)
     h = Activation('relu')(h)
 
