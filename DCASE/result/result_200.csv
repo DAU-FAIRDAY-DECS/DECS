@@ -1,0 +1,11 @@
+human
+section,AUC (source),AUC (target),pAUC,precision (source),precision (target),recall (source),recall (target),F1 score (source),F1 score (target)
+0.5,0.6485148514851485,0.564655172413793
+arithmetic mean,0.5,0.6485148514851485,0.564655172413793
+harmonic mean,0.5,0.6485148514851485,0.564655172413793
+
+,AUC (source),pAUC,precision (source),recall (source),F1 score (source)
+"arithmetic mean over all machine types, sections, and domains",0.5,0.6485148514851485,0.564655172413793
+"harmonic mean over all machine types, sections, and domains",0.5,0.6485148514851485,0.564655172413793
+
+Decision Threshold:,71.53307387276442

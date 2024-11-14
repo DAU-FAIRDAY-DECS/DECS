@@ -1,0 +1,13 @@
+human
+section,AUC (source),AUC (target),pAUC,precision (source),precision (target),recall (source),recall (target),F1 score (source),F1 score (target)
+0.5,0.23267326732673269,0.3175675675675676
+arithmetic mean,0.5,0.23267326732673269,0.3175675675675676
+harmonic mean,0.5,0.23267326732673266,0.3175675675675676
+
+,AUC (source),pAUC,precision (source),recall (source),F1 score (source)
+"arithmetic mean over all machine types, sections, and domains",0.5,0.23267326732673269,0.3175675675675676
+"harmonic mean over all machine types, sections, and domains",0.5,0.23267326732673266,0.3175675675675676
+
+2024-11-07 18:37:55,533 - INFO - precision (source) : 0.5
+2024-11-07 18:37:55,534 - INFO - recall (source) : 0.23267326732673269
+2024-11-07 18:37:55,534 - INFO - F1 score (source) : 0.3175675675675676

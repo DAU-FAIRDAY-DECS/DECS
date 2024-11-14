@@ -3,3 +3,13 @@
 /test_audio/
 /test_unaudio/
 /train_audio/
+/DCASE/dcase_dev_data/
+/DCASE/dcase_eval_data/
+/DCASE/dev_data/
+/DCASE/eval_data/
+/DCASE/model/
+/baseline.log
+/DCASE/baseline.log
+/DCASE/_pycache__/
+/DCASE/*.wav
+/DCASE/*.png
